@@ -1,0 +1,26 @@
+[project]
+name = "prompt_detection_study"
+version = "0.1.0"
+description = "Prompt detection algorithms study"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=3.4.1",
+    "fastparquet>=2024.11.0",
+    "huggingface-hub>=0.29.3",
+    "pandas>=2.2.3",
+    "polars>=1.25.2",
+    "scikit-learn>=1.6.1",
+    "torch>=2.6.0",
+    "transformers>=4.49.0",
+]
+
+[dependency-groups]
+dev = [
+    "hy>=1.0.0",
+    "ipython>=9.0.2",
+]
+
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
