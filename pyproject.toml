@@ -18,6 +18,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "hy>=1.0.0",
+    "hyrule>=1.0.0",
     "ipython>=9.0.2",
 ]
 

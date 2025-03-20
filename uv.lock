@@ -213,45 +213,6 @@ wheels = [
 ]
 
 [[package]]
-name = "deepset"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "datasets" },
-    { name = "fastparquet" },
-    { name = "huggingface-hub" },
-    { name = "pandas" },
-    { name = "polars" },
-    { name = "scikit-learn" },
-    { name = "torch" },
-    { name = "transformers" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "hy" },
-    { name = "ipython" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "datasets", specifier = ">=3.4.1" },
-    { name = "fastparquet", specifier = ">=2024.11.0" },
-    { name = "huggingface-hub", specifier = ">=0.29.3" },
-    { name = "pandas", specifier = ">=2.2.3" },
-    { name = "polars", specifier = ">=1.25.2" },
-    { name = "scikit-learn", specifier = ">=1.6.1" },
-    { name = "torch", specifier = ">=2.6.0" },
-    { name = "transformers", specifier = ">=4.49.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "hy", specifier = ">=1.0.0" },
-    { name = "ipython", specifier = ">=9.0.2" },
-]
-
-[[package]]
 name = "dill"
 version = "0.3.8"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
@@ -397,6 +358,15 @@ dependencies = [
     { name = "funcparserlib" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ab/7f/f8061ae737f6a564c3d4f80287bd5ff46afc1f606617a9cb5c797e6a974a/hy-1.0.0.tar.gz", hash = "sha256:3a00013e075ff5ce8f5d475ca2be47e4c871f09184ba3533787cb544d32d1f9e" }
+
+[[package]]
+name = "hyrule"
+version = "1.0.0"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
+dependencies = [
+    { name = "hy" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/64/c4/c32f8ea8a72debcdd176441b45d0163dfaf3d7a2f6c223fd3742d4d1a9fe/hyrule-1.0.0.tar.gz", hash = "sha256:499c858d736cead8555a129b6a361e958d03a1162aadc09071d28c342e6de8e8" }
 
 [[package]]
 name = "idna"
@@ -854,6 +824,47 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/9f/a5/5ff200ce3bc643d5f12d91eddb9720fa083267c45fe395bcf0046e97cc2d/polars-1.25.2-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:9dd91885c9ee5ffad8725c8591f73fb7bd2632c740277ee641f0453176b3d4b8" },
     { url = "https://mirrors.aliyun.com/pypi/packages/70/d5/7a5458d05d5a0af816b1c7034aa1d026b7b8176a8de41e96dac70fcf29e2/polars-1.25.2-cp39-abi3-win_amd64.whl", hash = "sha256:a547796643b9a56cb2959be87d7cb87ff80a5c8ae9367f32fe1ad717039e9afc" },
     { url = "https://mirrors.aliyun.com/pypi/packages/24/df/60d35c4ae8ec357a5fb9914eb253bd1bad9e0f5332eda2bd2c6371dd3668/polars-1.25.2-cp39-abi3-win_arm64.whl", hash = "sha256:a2488e9d4b67bf47b18088f7264999180559e6ec2637ed11f9d0d4f98a74a37c" },
+]
+
+[[package]]
+name = "prompt-detection-study"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "datasets" },
+    { name = "fastparquet" },
+    { name = "huggingface-hub" },
+    { name = "pandas" },
+    { name = "polars" },
+    { name = "scikit-learn" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "hy" },
+    { name = "hyrule" },
+    { name = "ipython" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=3.4.1" },
+    { name = "fastparquet", specifier = ">=2024.11.0" },
+    { name = "huggingface-hub", specifier = ">=0.29.3" },
+    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "polars", specifier = ">=1.25.2" },
+    { name = "scikit-learn", specifier = ">=1.6.1" },
+    { name = "torch", specifier = ">=2.6.0" },
+    { name = "transformers", specifier = ">=4.49.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "hy", specifier = ">=1.0.0" },
+    { name = "hyrule", specifier = ">=1.0.0" },
+    { name = "ipython", specifier = ">=9.0.2" },
 ]
 
 [[package]]
