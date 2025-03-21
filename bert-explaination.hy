@@ -1,3 +1,5 @@
+(import sklearn.decomposition [PCA])
+
 (setv tokens
   (tokenizer "How to study Prompt Injection of LLM?"  ; see API doc with `?tokenizer.__call__`
     :padding True
@@ -26,3 +28,9 @@
 
 (setv demo-emb (gen-sentence-embedding "I almost finish it"))
 (. demo-emb dtype)
+
+(setv pca (PCA :n-components 2))
+
+(.fit pca Xtrain)
+(. pca explained_variance_ratio_)
+

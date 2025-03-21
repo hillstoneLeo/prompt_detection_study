@@ -10,6 +10,8 @@ uv run huggingface-cli download deepset/prompt-injections --local-dir data --rep
 uv run hy app.hy
 ```
 
+Generate Python script with `uv run hy2py app.hy`.
+
 ## References
 
 * [BERT-based detection](https://github.com/sinanw/llm-security-prompt-injection)
