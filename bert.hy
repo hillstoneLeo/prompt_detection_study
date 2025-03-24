@@ -1,11 +1,20 @@
+"This script:
+ 1. Loads training and test dataset from `data` folder;
+ 2. Embedding text with BERT;
+ 3. Train embedddings with several ML models;
+ 4. Save models in `models` folder.
+ 5. Print model metrics."
+
 (require hyrule [->])
-(import torch
+(import joblib
+        pathlib [Path]
         polars :as pl
         sklearn.ensemble [RandomForestClassifier]
         sklearn.linear_model [LogisticRegression]
         sklearn.metrics [accuracy_score precision_score recall_score f1_score]
         sklearn.naive_bayes [GaussianNB]
         sklearn.svm [SVC]
+        torch
         transformers [BertTokenizer BertModel])
 
 (defn gen-sentence-embedding [prompt]
@@ -21,9 +30,10 @@
     .squeeze
     .numpy))
 
-(defn eval-model [estimator]
+(defn eval-model [estimator model-path]
   (let [model (get estimators estimator)
         y-pred (do (.fit model x-train (get train "label"))
+                   (joblib.dump model model-path)
                    (.predict model x-test))]
     {"Estimator" estimator
      "Accuracy" (accuracy_score (get test "label") y-pred)
@@ -59,12 +69,17 @@
     (.to-list)
     (pl.from-records :orient "row"))
 
-  estimators {"Naive Bayes" (GaussianNB)
-              "Logistic Regression" (LogisticRegression)
-              "Support Vector Machine" (SVC)
-              "Random Forest" (RandomForestClassifier)}
+  estimators {"naive-bayes" (GaussianNB)
+              "logistic-regression" (LogisticRegression)
+              "support-vector-machine" (SVC)
+              "random-forest" (RandomForestClassifier)}
 
   result (pl.from-dicts
-           (lfor est estimators (eval-model est))))
+           (let [model-base-path (Path "./models")]
+             (.mkdir model-base-path :exist-ok True)
+             (lfor est estimators
+               (eval-model est (.joinpath
+                                model-base-path
+                                f"{est}.pkl"))))))
 
 (print f"Analysis result:\n{result}")
