@@ -3,7 +3,9 @@
  2. Embedding text with BERT;
  3. Train embedddings with several ML models;
  4. Save models in `models` folder.
- 5. Print model metrics."
+ 5. Print model metrics.
+ 
+See section 'Usage' in READMD.md to setup the environment."
 
 (require hyrule [->])
 (import joblib
@@ -17,69 +19,70 @@
         torch
         transformers [BertTokenizer BertModel])
 
-(defn gen-sentence-embedding [prompt]
+(defn gen-sentence-embedding [tokenizer bert-model prompt]
   (setv tokens (tokenizer prompt
-                         :padding True
-                         :truncation True
-                         :return-tensors "pt"
-                         :add-special-tokens True))
+                          :padding True
+                          :truncation True
+                          :return-tensors "pt"
+                          :add-special-tokens True))
   (with [_ (torch.no-grad)]
-    (setv output (model #** tokens)))
+    (setv output (bert-model #** tokens)))
   (-> output.last-hidden-state
     (.mean :dim 1)
     .squeeze
     .numpy))
 
-(defn eval-model [estimator model-path]
-  (let [model (get estimators estimator)
-        y-pred (do (.fit model x-train (get train "label"))
+(defn load-data [root-folder]
+  (let [ds-train (pl.read_parquet
+                   f"{root-folder}/deepset/data/train-00000-of-00001-9564e8b05b4757ab.parquet")
+        ds-test (pl.read_parquet
+                  f"{root-folder}/deepset/data/test-00000-of-00001-701d16158af87368.parquet")
+        sf-train (pl.read_parquet f"{root-folder}/safe-guard/data/train-00000-of-00001.parquet")
+        sf-test (pl.read_parquet f"{root-folder}/safe-guard/data/test-00000-of-00001.parquet")
+        btoz (BertTokenizer.from_pretrained "bert-base-multilingual-uncased")
+        bmod (BertModel.from_pretrained "bert-base-multilingual-uncased")]
+    {:x-train 
+     (-> (pl.concat [ds-train sf-train])
+       (get "text")
+       (.map-elements (fn [p] (gen-sentence-embedding btoz bmod p)))
+       (.to-list)
+       (pl.from-records :orient "row"))
+     :x-test
+     (-> (pl.concat [ds-test sf-test])
+       (get "text")
+       (.map-elements (fn [p] (gen-sentence-embedding btoz bmod p)))
+       (.to-list)
+       (pl.from-records :orient "row"))
+     :y-train (get (pl.concat [ds-train sf-train]) "label")
+     :y-test (get (pl.concat [ds-test sf-test]) "label")}))
+  
+(defn eval-model [dataset estimator model model-path]
+  (let [y-test (get dataset :y-test)
+        y-pred (do (.fit model (get dataset :x-train) (get dataset :y-train))
                    (joblib.dump model model-path)
-                   (.predict model x-test))]
+                   (.predict model (get dataset :x-test)))]
     {"Estimator" estimator
-     "Accuracy" (accuracy_score (get test "label") y-pred)
-     "Precision" (precision_score (get test "label") y-pred)
-     "Recall" (recall_score (get test "label") y-pred)
-     "F1 Score" (f1_score (get test "label") y-pred)}))
+     "Accuracy" (accuracy_score y-test y-pred)
+     "Precision" (precision_score y-test y-pred)
+     "Recall" (recall_score y-test y-pred)
+     "F1 Score" (f1_score y-test y-pred)}))
 
-(setv
-  tokenizer (BertTokenizer.from_pretrained "bert-base-multilingual-uncased")
-  model (BertModel.from_pretrained "bert-base-multilingual-uncased")
-
-  train (.rename
-          (pl.read_parquet
-            "./data/data/train-00000-of-00001-9564e8b05b4757ab.parquet")
-          {"text" "prompt"})
-
-  test (.rename
-         (pl.read_parquet
-           "./data/data/test-00000-of-00001-701d16158af87368.parquet")
-         {"text" "prompt"})
-
-  x-train
-  (-> train
-    (get "prompt")
-    (.map-elements gen-sentence-embedding)
-    (.to-list)
-    (pl.from-records :orient "row"))
-
-  x-test
-  (-> test
-    (get "prompt")
-    (.map-elements gen-sentence-embedding)
-    (.to-list)
-    (pl.from-records :orient "row"))
-
-  estimators {"naive-bayes" (GaussianNB)
-              "logistic-regression" (LogisticRegression)
-              "support-vector-machine" (SVC)
-              "random-forest" (RandomForestClassifier)}
-
-  result (pl.from-dicts
-           (let [model-base-path (Path "./models")]
-             (.mkdir model-base-path :exist-ok True)
-             (lfor est estimators
-               (eval-model est (.joinpath
-                                model-base-path
-                                f"{est}.pkl"))))))
-
-(print f"Analysis result:\n{result}")
+(let [model-base-path (Path "./models")
+      data (load-data "./data")    
+      estimators {:naive-bayes (GaussianNB)
+                  :logistic-regression (LogisticRegression)
+                  :support-vector-machine (SVC)
+                  :random-forest (RandomForestClassifier)}
+      result
+      (pl.from-dicts
+        (lfor
+          ename estimators
+          :setv emod (get estimators ename)
+          (eval-model data
+                      ename
+                      emod
+                      (.joinpath
+                       model-base-path
+                       f"{ename}.pkl"))))]
+  
+  (print f"Analysis result:\n{result}"))

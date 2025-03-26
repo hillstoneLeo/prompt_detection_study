@@ -6,7 +6,10 @@ Prompt injection detection algorithms study.
 
 ```sh
 uv run huggingface-cli login  # login with your token
-uv run huggingface-cli download deepset/prompt-injections --local-dir data --repo-type dataset
+uv run huggingface-cli download --repo-type dataset deepset/prompt-injections --local-dir data/deepset
+uv run huggingface-cli download --repo-type dataset reshabhs/SPML_Chatbot_Prompt_Injection --local-dir data/SPML
+uv run huggingface-cli download --repo-type dataset xTRam1/safe-guard-prompt-injection --local-dir data/safe-guard
+mkdir -p models
 uv run hy app.hy
 ```
 
