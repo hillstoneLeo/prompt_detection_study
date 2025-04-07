@@ -1,11 +1,4 @@
-"This script:
- 1. Loads training and test dataset from `data` folder;
- 2. Embedding text with BERT;
- 3. Train embedddings with several ML models;
- 4. Save models in `models` folder.
- 5. Print model metrics.
- 
-See section 'Usage' in READMD.md to setup the environment."
+"See section 'Usage' in READMD.md to setup the environment."
 
 (require hyrule [->])
 (import joblib
@@ -43,8 +36,7 @@ See section 'Usage' in READMD.md to setup the environment."
      :recall (recall_score label predict)
      :f1-score (f1_score label predict)}))
 
-;; Generate embeddings from `prompt` with `tokenizer`, `bert-model`
-;; Usage:
+;; Generate embeddings from `prompt` with `tokenizer`, `bert-model`. Usage:
 ;; (gen-sentence-embedding btok bmod p)
 (defn gen-sentence-embedding [tokenizer bert-model prompt]
   (setv tokens (tokenizer prompt
@@ -59,8 +51,7 @@ See section 'Usage' in READMD.md to setup the environment."
     .squeeze
     .numpy))
 
-;; Load dataset deespset & safe-guard from `root-foler`.
-;; Usage:
+;; Load dataset deespset & safe-guard from `root-foler`. Usage:
 ;; (load-data "./data")
 (defn load-data [root-folder]
   (let [ds-train (pl.read_parquet
@@ -84,8 +75,15 @@ See section 'Usage' in READMD.md to setup the environment."
      :y-train (get (pl.concat [ds-train sf-train]) "label")
      :y-test (get (pl.concat [ds-test sf-test]) "label")}))
 
+;; Training models based on data loaded from `data-path`,
+;; then save models in `model-path`:
+;; 1. Loads training and test dataset from `data` folder;
+;; 2. Embedding text with BERT;
+;; 3. Train embedddings with several ML models;
+;; 4. Save models in `models` folder.
+;; 5. Print model metrics.)
 ;; Usage:
-;; (setv train-models "./data" "./models")
+;; (setv model-metrics (train-models "./data" "./models"))
 (defn train-models [data-path model-path]
   (defn eval-model [dataset estimator model model-path]
     (let [y-test (get dataset :y-test)
