@@ -1,9 +1,17 @@
 "See section 'Usage' in READMD.md to setup the environment."
 
+;; Cached data:
+
+;; (setv data (joblib.load "./data/dataset.pkl"))
+;; (setv model (joblib.load f"./models/{model-name}.pkl"))
+
+
 (require hyrule [->])
 (import joblib
+        numpy :as np
         pathlib [Path]
         polars :as pl
+        seaborn :as sns
         sklearn.ensemble [RandomForestClassifier]
         sklearn.linear_model [LogisticRegression]
         sklearn.metrics [accuracy_score
@@ -14,6 +22,7 @@
                          roc_curve]
         sklearn.naive_bayes [GaussianNB]
         sklearn.svm [SVC]
+        snoop :as snp
         time [sleep]
         torch
         transformers [BertTokenizer BertModel]
@@ -166,3 +175,14 @@
     (.write-csv predict-res "injection-predict.tsv" :separator "\t")
     (pred-metrics y-test y-pred)))
 
+(import sklearn.cluster [DBSCAN]
+        sklearn.metrics.pairwise [cosine_similarity])
+(setv data (pp(load-data "./data"))
+      cos-sim-mat (cosine_similarity (get data :x-train))
+      cos-sim (get cos-sim-mat (np.tril_indices_from cos-sim-mat -1))
+      model_DB (.fit (DBSCAN :eps 0.0012 :min-samples 400 :metric "cosine") cos-sim-mat)
+      labels model_DB.labels_
+      [unique counts] (np.unique labels :return-counts True))
+
+(dict (zip unique counts))
+(.savefig (.get_figure (sns.histplot :data cos-sim :bins 20)) "cos-sim-dist2.png")
